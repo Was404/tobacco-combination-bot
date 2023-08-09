@@ -56,5 +56,5 @@ async def send_penis(message: types.Message):
     await bot.send_photo(chat_id=message.chat.id, photo="https://cdn-icons-png.flaticon.com/512/6147/6147668.png")
     await message.delete()
 
-if __name__ == "__app__":
+if __name__ == "__main__":
     executor.start_polling(dp, on_startup=on_startup, skip_updates=True)
