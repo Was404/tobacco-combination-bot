@@ -5,3 +5,4 @@
 #dp.message_handler(commands=['photo'])
 #async def send_adress(message: types.Message):
 #   await bot.send_location(chat_id = message.from_user.id, latitude = 55, longitude = 74)
+# message.capitalize()
