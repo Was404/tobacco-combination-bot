@@ -52,8 +52,8 @@ async def send_penis(message: types.Message):
 
 @dp.message_handler()
 async def interception(message: types.Message):
-    if message.text.count(' ') > 1:
-        await message.answer(result(message.text.capitalize()))
+    if message.text.count(' ') >= 1:
+        await message.answer(result(message.text))
     else:
         await message.answer(text = COUNT_ERROR, parse_mode="HTML")
         await bot.send_sticker(message.from_user.id, sticker="CAACAgIAAxkBAAEJ9exk0oa87s2dqdLDTO0j6_g3tyYDbgAC1AsAAg74eUlJg1T3YVm93jAE")    

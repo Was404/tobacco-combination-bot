@@ -10,6 +10,7 @@ def result(msg):
     result = []
 
     try:
+        print("ｔｈｅ ｍｉｘｅｒ ｈａｓ ｓｔａｒｔｅｄ")
         for i in range(len(words_list[:-1:])):
 
             first = words_list[i]
@@ -47,9 +48,9 @@ def result(msg):
                 print("COLNAME", col_name)
 
                 result.append(sovpad_vkusi.loc[idx, col_name])
-
+        print("ｗｏｒｋ ｉｓ ｏｖｅｒ")
         return result
-    
+            
     except:
         return 'Возникли трудности при обработке😓. Попробуйте написать по-другому...'
 
