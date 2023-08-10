@@ -26,7 +26,7 @@ def result(msg):
             col_name = sovpad_vkusi.columns[sovpad_vkusi.columns.str.contains(name_of_col2)][0] 
             print("COLNAME", col_name)
 
-            result.append(sovpad_vkusi.loc[idx, col_name])
+            result.append(f"{first}'{name_of_col1}' + {second}'{name_of_col2}' = {sovpad_vkusi.loc[idx, col_name]}")
 
         if len(words_list) > 2:
             print("!Start mathing last!")
@@ -47,9 +47,15 @@ def result(msg):
                 col_name = sovpad_vkusi.columns[sovpad_vkusi.columns.str.contains(name_of_col2)][0] 
                 print("COLNAME", col_name)
 
-                result.append(sovpad_vkusi.loc[idx, col_name])
+                result.append(f"{last}'{name_of_col1}' + {pepa}'{name_of_col2}' = {sovpad_vkusi.loc[idx, col_name]}")
+                
         print("ｗｏｒｋ ｉｓ ｏｖｅｒ")
-        return result
+
+        pd.set_option('display.max_colwidth', None)
+        result_series = pd.Series(result)
+        result_series.reset_index(drop=True)
+        result_series.index += 1
+        return result_series
             
     except:
         return 'Возникли трудности при обработке😓. Попробуйте написать по-другому...'

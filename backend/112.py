@@ -1,7 +1,7 @@
 import pandas as pd
 #import string
-sovpad_vkusi = pd.read_excel('data\TABAKI2.xlsx')
-black_bern = pd.read_excel('data\BlackBern.xlsx')
+sovpad_vkusi = pd.read_excel('backend\data\TABAKI2.xlsx')
+black_bern = pd.read_excel('backend\data\BlackBern.xlsx')
 
 print("Кол-во столбцов ", black_bern.shape[1])
 print("Кол-во столбцов TABAKI2", sovpad_vkusi.shape[1])
@@ -12,13 +12,17 @@ msg = "Irish cream, Basillic, Haribon, Pistachio ice snow"
 words_list = msg.split(", ")
 print(words_list)
 result = []
+name_of_col_list = []
 
 for i in range(len(words_list[:-1:])):
     first = words_list[i]
     second = words_list[i+1]
     print("INPUT:", first, second)
     name_of_col1 = black_bern.columns[black_bern.isin([first]).any()][0]
+    if i<1:
+         name_of_col_list.append(name_of_col1)
     name_of_col2 = black_bern.columns[black_bern.isin([second]).any()][0]
+    name_of_col_list.append(name_of_col2)
     print("OUTPUT:", name_of_col1, name_of_col2)
 
     idx = sovpad_vkusi[sovpad_vkusi.iloc[:, 0] == name_of_col1].index[0]
@@ -26,13 +30,12 @@ for i in range(len(words_list[:-1:])):
     col_name = sovpad_vkusi.columns[sovpad_vkusi.columns.str.contains(name_of_col2)][0] 
     print("COLNAME", col_name)
 
-    result.append(sovpad_vkusi.loc[idx, col_name])
-    print(result)
+    result.append(f"{first}'{name_of_col1}' + {second}'{name_of_col2}' = {sovpad_vkusi.loc[idx, col_name]}")
 
 if len(words_list) > 2:
         print("!Start mathing last!")
         last = words_list[-1]
-        
+            
         for i in reversed(range(len(words_list) -1)):
             if i == len(words_list) - 2:
                 continue
@@ -48,6 +51,14 @@ if len(words_list) > 2:
             col_name = sovpad_vkusi.columns[sovpad_vkusi.columns.str.contains(name_of_col2)][0] 
             print("COLNAME", col_name)
 
-            result.append(sovpad_vkusi.loc[idx, col_name])
+            result.append(f"{first}'{name_of_col1}' + {second}'{name_of_col2}' = {sovpad_vkusi.loc[idx, col_name]}")
+              
+print("Что можно смешивать?\n")
+pd.set_option('display.max_colwidth', None)
+result_series = pd.Series(result)
+result_series.reset_index(drop=True)
+result_series.index += 1
+print(result_series)
+#print(name_of_col_list)
 
-print(result)
+
