@@ -3,9 +3,7 @@ HELP_COMMAND = """
 /help - список команд
 /description - описание
 /mix_descr - описание микса
-/dev_tobacco - выбрать производителя табака
 /save_mix - сохранить микс
-/back - назад
 """
 
 START_TEXT = """
