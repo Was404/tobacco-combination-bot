@@ -3,15 +3,22 @@ import pandas as pd
 sovpad_vkusi = pd.read_excel('backend\data\TABAKI2.xlsx')
 black_bern = pd.read_excel('backend\data\BlackBern.xlsx')
 
+selected_variabl = ""
+
+def handle_variable(vare):
+    global selected_variabl
+    selected_variabl = vare
+
 def result(msg):
 
     words_list = msg.split(", ")
     print(words_list)
     result = []
-    #data_change = selected_variable + ".xlsx"
-    #if data_change != None:                                  #Вам всем п#@д3
-    #    black_bern = pd.read_excel('backend\\data\\' + data_change)
-    #    print(f"Датафрейм поменялся на {data_change}")
+    
+    if selected_variabl != "":                                  #Вам всем п#@д3
+       black_bern = pd.read_excel('backend\\data\\' + selected_variabl)
+       print(f"Датафрейм поменялся на {selected_variabl}")
+       #print(f"!!! Новый путь к датафрейм: {black_bern} !!!")
 
     try:
         print("ｔｈｅ ｍｉｘｅｒ ｈａｓ ｓｔａｒｔｅｄ")

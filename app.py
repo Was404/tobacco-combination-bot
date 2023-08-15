@@ -3,7 +3,8 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemo
 from config import TOKEN_API 
 from strings import HELP_COMMAND, START_TEXT, DESCRIPTION, COUNT_ERROR
 from backend.main import result
-from backend.additional_functions import find_all_names, ManufacorChoice
+from backend.main import handle_variable
+from backend.additional_functions import find_all_names, ManufacorChoice, handle_variable2
 import logging
 #from os import getenv
 
@@ -26,9 +27,13 @@ kb.add(btn1).add(btn2) # insert(кнопка) - для нов столбика
 
 ikb = InlineKeyboardMarkup()
 ibtn_names_tobacco = InlineKeyboardButton(text="Табаки", callback_data="names_tobacco")
-ibtn_back = InlineKeyboardButton(text="Назад", callback_data="back_button", one_time_keyboard = True) #Назад только один раз
+ibtn_back = InlineKeyboardButton(text="Назад", callback_data="back_button") #Назад только один раз
 ibtn_manufactor = InlineKeyboardButton(text="Производители", callback_data="manufacor")
 ikb.add(ibtn_manufactor).add(ibtn_names_tobacco).add(ibtn_back)
+
+ikb_back_only = InlineKeyboardMarkup()
+ill_come_back = InlineKeyboardButton(text= "Вернуться назад", callback_data="fuckgoback")
+ikb_back_only.add(ill_come_back)
 """ КОНЕЦ КЛАВИАТУРА """
 
 async def on_startup(_):
@@ -39,14 +44,14 @@ async def start(message: types.Message):
     global previous_message
     await message.answer(text= START_TEXT, parse_mode="HTML", reply_markup = ikb) # написать
     previous_message = message.text
-    await message.delete() # удоли сообщение пользователя
+    #await message.delete() # удоли сообщение пользователя
         
 @dp.message_handler(commands=['help'])
 async def help_command(message: types.Message):
     global previous_message
     await message.answer(HELP_COMMAND) # ответить
     previous_message = message.text
-    await message.delete()
+    
 @dp.message_handler(text = 'Помощь')
 async def help_command(message: types.Message):
     global previous_message
@@ -59,7 +64,7 @@ async def description_command(message: types.Message):
     global previous_message 
     await message.answer(DESCRIPTION)
     previous_message = message.text
-    await message.delete()
+    
 @dp.message_handler(text = 'Описание')
 async def help_command(message: types.Message):
     await message.answer(DESCRIPTION) # ответить
@@ -90,9 +95,9 @@ async def interception(message: types.Message):
             number_of_inputs = 0
           
 
-@dp.callback_query_handler(lambda callback_query: callback_query.data == 'names_tobacco')
+@dp.callback_query_handler(lambda callback_query: callback_query.data == 'names_tobacco') #Табаки
 async def process_callback_button(callback_query: types.CallbackQuery):
-    await bot.send_message(callback_query.from_user.id, text= find_all_names())
+    await bot.send_message(callback_query.from_user.id, text= find_all_names(), reply_markup=ikb_back_only)
     
 
 @dp.callback_query_handler(text='back_button')
@@ -117,7 +122,7 @@ async def process_callback_button(callback_query: types.CallbackQuery):
         ikb_manufactors.add(InlineKeyboardButton(text= var, callback_data=var))
     await bot.edit_message_text(chat_id=callback_query.message.chat.id,
                                 message_id=callback_query.message.message_id,
-                                text=f"Найдены производители:\n {manufacturers_str}\n Выберите производителя табака⬇", reply_markup=ikb_manufactors)    
+                                text=f"Найдены производители:\n {manufacturers_str}\n⬇Выберите производителя табака⬇", reply_markup=ikb_manufactors)    
     @dp.callback_query_handler(lambda callback_query: True)
     async def process_callback(callback_query: types.CallbackQuery):
         # Получаем текст нажатой кнопки
@@ -126,9 +131,13 @@ async def process_callback_button(callback_query: types.CallbackQuery):
         await bot.send_message(callback_query.from_user.id, f"Вы выбрали: {selected_variable}")
         await bot.send_message(callback_query.from_user.id, text= START_TEXT, parse_mode="HTML", reply_markup = ikb)
         str(selected_variable)
-        find_all_names(selected_variable + ".xlsx")
-        
-       
+        v = selected_variable + ".xlsx"
+        handle_variable(v)
+        handle_variable2(v)
+
+@dp.callback_query_handler(lambda callback_query: callback_query.data == 'fuckgoback')
+async def back_back_button(callback_query: types.CallbackQuery):
+    await bot.send_message(callback_query.from_user.id, text= START_TEXT, parse_mode="HTML", reply_markup = ikb)      
 
 if __name__ == "__main__":
     #logging.basicConfig(level=logging.INFO, stream=sys.stdout)
