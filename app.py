@@ -3,7 +3,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemo
 from config import TOKEN_API 
 from strings import HELP_COMMAND, START_TEXT, DESCRIPTION, COUNT_ERROR
 from backend.main import result
-from backend.additional_functions import find_all_names
+from backend.additional_functions import find_all_names, ManufacorChoice
 import logging
 #from os import getenv
 
@@ -11,6 +11,12 @@ bot = Bot(TOKEN_API)
 dp = Dispatcher(bot)
 
 logging.basicConfig(level=logging.INFO)
+#Всякие переменные 
+count = 0
+number_of_inputs = 0
+previous_message = ''# Переменная для хранения предыдущего сообщения
+list_manufacors = ManufacorChoice()
+#Конец всяких переменных
 
 """ КЛАВИАТУРА """
 kb = ReplyKeyboardMarkup(resize_keyboard=True) # parameter one_time_keyboard def=False
@@ -21,14 +27,10 @@ kb.add(btn1).add(btn2) # insert(кнопка) - для нов столбика
 ikb = InlineKeyboardMarkup()
 ibtn_names_tobacco = InlineKeyboardButton(text="Табаки", callback_data="names_tobacco")
 ibtn_back = InlineKeyboardButton(text="Назад", callback_data="back_button")
-ikb.add(ibtn_names_tobacco).add(ibtn_back)
+ibtn_manufactor = InlineKeyboardButton(text="Производители", callback_data="manufacor")
+ikb.add(ibtn_manufactor).add(ibtn_names_tobacco).add(ibtn_back)
 """ КОНЕЦ КЛАВИАТУРА """
 
-#Всякие переменные 
-count = 0
-number_of_inputs = 0
-previous_message = ''# Переменная для хранения предыдущего сообщения
-#Конец всяких переменных
 async def on_startup(_):
     print("Стартуем!")
 
@@ -79,7 +81,7 @@ async def interception(message: types.Message):
     global previous_message
     if message.text.count(' ') >= 1:
         previous_message = message.text
-        await message.answer(result(message.text), reply_markup= ikb)
+        await message.answer(result(message.text))
     else:
         await message.answer(text = COUNT_ERROR, parse_mode="HTML")
         number_of_inputs +=1
@@ -104,6 +106,23 @@ async def back_button_handler(query: types.CallbackQuery):
 
     # Удаляем кнопку
     await query.message.delete()    
+
+@dp.callback_query_handler(lambda callback_query: callback_query.data == 'manufacor') #Производители и выбор одного из производителя
+async def process_callback_button(callback_query: types.CallbackQuery):
+    for i in range(len(list_manufacors)):# для удаления 'xlsx' из каждого объекта
+        list_manufacors[i] = list_manufacors[i].replace('.xlsx', '')
+    ikb_manufactors = InlineKeyboardMarkup()
+    for var in list_manufacors:
+        ikb_manufactors.add(InlineKeyboardButton(text= var, callback_data=var))
+    await bot.edit_message_text(chat_id=callback_query.message.chat.id,
+                                message_id=callback_query.message.message_id,
+                                text=f"Найденные производители:\n {list_manufacors}\n Выберите производителя табака⬇", reply_markup=ikb_manufactors)    
+    @dp.callback_query_handler(lambda callback_query: True)
+    async def process_callback(callback_query: types.CallbackQuery):
+        # Получаем текст нажатой кнопки
+        selected_variable = callback_query.data
+        print(f"Пользователь выбрал: {selected_variable}")
+        await bot.send_message(callback_query.from_user.id, f"Вы выбрали: {selected_variable}")
 
 if __name__ == "__main__":
     #logging.basicConfig(level=logging.INFO, stream=sys.stdout)
