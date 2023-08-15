@@ -8,6 +8,10 @@ def result(msg):
     words_list = msg.split(", ")
     print(words_list)
     result = []
+    #data_change = selected_variable + ".xlsx"
+    #if data_change != None:                                  #Вам всем п#@д3
+    #    black_bern = pd.read_excel('backend\\data\\' + data_change)
+    #    print(f"Датафрейм поменялся на {data_change}")
 
     try:
         print("ｔｈｅ ｍｉｘｅｒ ｈａｓ ｓｔａｒｔｅｄ")
