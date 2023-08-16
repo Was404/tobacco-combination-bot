@@ -17,10 +17,11 @@ def find_all_names(): #функция для поиска всех наимен�
     else:
         path = 'backend\data\BlackBern.xlsx' # Ничего не выбрали? Вернулись к экземпляру по умолчанию
     print(path)
-    pd.set_option('display.max_colwidth', None)
+    pd.set_option('display.max_rows', None)
+    pd.set_option('display.max_info_columns', 0)
     dataname, _ = os.path.splitext(os.path.basename(path)) # !!ВАЖНО!! ДОЛЖЕН БЫТЬ СТОЛБИК С ТАКИМ ЖЕ ИМЕНЕМ КАК ИМЯ ФАЙЛА  !!!
     black_bern = pd.read_excel(path)
-    result = black_bern[dataname] #Выводим все вкусы данного производителя 
+    result = black_bern[dataname].dropna() #Выводим все вкусы данного производителя 
     return result
 
 def ManufacorChoice(): #поиск всех exel файлов от производителей в data

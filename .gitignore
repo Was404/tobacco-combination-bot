@@ -4,3 +4,4 @@ venv/Lib/
 
 config.py
 __pycache__/
+bot.log

@@ -6,12 +6,13 @@ from backend.main import result
 from backend.main import handle_variable
 from backend.additional_functions import find_all_names, ManufacorChoice, handle_variable2
 import logging
+from datetime import datetime
 #from os import getenv
 
 bot = Bot(TOKEN_API)
 dp = Dispatcher(bot)
 
-logging.basicConfig(level=logging.INFO)
+#logging.basicConfig(level=logging.INFO)
 #Всякие переменные 
 count = 0
 number_of_inputs = 0
@@ -55,7 +56,7 @@ async def help_command(message: types.Message):
 @dp.message_handler(text = 'Помощь')
 async def help_command(message: types.Message):
     global previous_message
-    await message.answer(HELP_COMMAND) # ответить
+    await message.answer(HELP_COMMAND, reply_markup=ikb_back_only) # ответить
     previous_message = message.text
     await message.delete()
         
@@ -67,7 +68,7 @@ async def description_command(message: types.Message):
     
 @dp.message_handler(text = 'Описание')
 async def help_command(message: types.Message):
-    await message.answer(DESCRIPTION) # ответить
+    await message.answer(DESCRIPTION, reply_markup=ikb_back_only) # ответить
     await message.delete()     
 
 @dp.message_handler(text = 'Пенис')
@@ -86,7 +87,7 @@ async def interception(message: types.Message):
     global previous_message
     if message.text.count(' ') >= 1:
         previous_message = message.text
-        await message.answer(result(message.text), reply_markup=ikb)
+        await message.answer(result(message.text), reply_markup=ikb_back_only)
     else:
         await message.answer(text = COUNT_ERROR, parse_mode="HTML", reply_markup=kb)
         number_of_inputs +=1
@@ -140,6 +141,19 @@ async def process_callback_button(callback_query: types.CallbackQuery):
 @dp.callback_query_handler(lambda callback_query: callback_query.data == 'fuckgoback')
 async def back_back_button(callback_query: types.CallbackQuery):
     await bot.send_message(callback_query.from_user.id, text= START_TEXT, parse_mode="HTML", reply_markup = ikb)      
+
+
+current_time = datetime.now()
+formatted_date = current_time.strftime("%Y-%m-%d %H:%M:%S")
+logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
+        handlers=[
+            logging.FileHandler('bot.log'),
+            logging.StreamHandler(),
+        ],
+    )
+logging.debug('Старт программы')
 
 if __name__ == "__main__":
     #logging.basicConfig(level=logging.INFO, stream=sys.stdout)
