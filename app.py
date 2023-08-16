@@ -29,7 +29,7 @@ ikb = InlineKeyboardMarkup()
 ibtn_names_tobacco = InlineKeyboardButton(text="Табаки", callback_data="names_tobacco")
 ibtn_back = InlineKeyboardButton(text="Назад", callback_data="back_button") #Назад только один раз
 ibtn_manufactor = InlineKeyboardButton(text="Производители", callback_data="manufacor")
-ikb.add(ibtn_manufactor).add(ibtn_names_tobacco).add(ibtn_back)
+ikb.add(ibtn_manufactor).add(ibtn_names_tobacco)
 
 ikb_back_only = InlineKeyboardMarkup()
 ill_come_back = InlineKeyboardButton(text= "Вернуться назад", callback_data="fuckgoback")
@@ -88,7 +88,7 @@ async def interception(message: types.Message):
         previous_message = message.text
         await message.answer(result(message.text), reply_markup=ikb)
     else:
-        await message.answer(text = COUNT_ERROR, parse_mode="HTML")
+        await message.answer(text = COUNT_ERROR, parse_mode="HTML", reply_markup=kb)
         number_of_inputs +=1
         if number_of_inputs > 2:
             await bot.send_sticker(message.from_user.id, sticker="CAACAgIAAxkBAAEJ9exk0oa87s2dqdLDTO0j6_g3tyYDbgAC1AsAAg74eUlJg1T3YVm93jAE")
@@ -120,15 +120,17 @@ async def process_callback_button(callback_query: types.CallbackQuery):
     manufacturers_str = '\n'.join(list_manufacors)
     for var in list_manufacors:
         ikb_manufactors.add(InlineKeyboardButton(text= var, callback_data=var))
+    ikb_manufactors.add(ill_come_back)    
     await bot.edit_message_text(chat_id=callback_query.message.chat.id,
                                 message_id=callback_query.message.message_id,
-                                text=f"Найдены производители:\n {manufacturers_str}\n⬇Выберите производителя табака⬇", reply_markup=ikb_manufactors)    
+                                text=f"Найдены производители:\n {manufacturers_str}\n⬇Выберите производителя табака⬇", reply_markup=ikb_manufactors) 
     @dp.callback_query_handler(lambda callback_query: True)
     async def process_callback(callback_query: types.CallbackQuery):
         # Получаем текст нажатой кнопки
         selected_variable = callback_query.data
         print(f"Пользователь выбрал: {selected_variable}")
         await bot.send_message(callback_query.from_user.id, f"Вы выбрали: {selected_variable}")
+        await bot.delete_message(chat_id=callback_query.message.chat.id, message_id=callback_query.message.message_id)
         await bot.send_message(callback_query.from_user.id, text= START_TEXT, parse_mode="HTML", reply_markup = ikb)
         str(selected_variable)
         v = selected_variable + ".xlsx"
