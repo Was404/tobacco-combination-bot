@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 # This is file need for experiments and new features
-path = 'backend\data\ '
+path = 'backend/data/'
 
 selected_variabl = ""
 
@@ -13,9 +13,9 @@ def handle_variable2(vare):
 def find_all_names(): #функция для поиска всех наименнований табака одного производителя
     #dataname = os.path.basename(path).replace(".xlsx", "")
     if selected_variabl != "":
-        path = 'backend\\data\\' + selected_variabl
+        path = 'backend/data/' + selected_variabl
     else:
-        path = 'backend\data\BlackBern.xlsx' # Ничего не выбрали? Вернулись к экземпляру по умолчанию
+        path = 'backend/data/BlackBern.xlsx' # Ничего не выбрали? Вернулись к экземпляру по умолчанию
     print(path)
     pd.set_option('display.max_rows', None)
     pd.set_option('display.max_info_columns', 0)
@@ -25,7 +25,7 @@ def find_all_names(): #функция для поиска всех наимен�
     return result
 
 def ManufacorChoice(): #поиск всех exel файлов от производителей в data
-    folder_path = "backend\data"  # указать путь к папке 
+    folder_path = "backend/data"  # указать путь к папке 
     excel_file = []
     for file_name in os.listdir(folder_path):
         if file_name.endswith(".xlsx") and file_name != "TABAKI2.xlsx":

@@ -1,7 +1,7 @@
 import pandas as pd
 
-sovpad_vkusi = pd.read_excel('backend\data\TABAKI2.xlsx')
-black_bern = pd.read_excel('backend\data\BlackBern.xlsx')
+sovpad_vkusi = pd.read_excel('backend/data/TABAKI2.xlsx')
+black_bern = pd.read_excel('backend/data/BlackBern.xlsx')
 
 selected_variabl = ""
 
@@ -16,7 +16,7 @@ def result(msg):
     result = []
     
     if selected_variabl != "":                                  #Вам всем п#@д3
-       black_bern = pd.read_excel('backend\\data\\' + selected_variabl)
+       black_bern = pd.read_excel('backend/data/' + selected_variabl)
        print(f"Датафрейм поменялся на {selected_variabl}")
        #print(f"!!! Новый путь к датафрейм: {black_bern} !!!")
 

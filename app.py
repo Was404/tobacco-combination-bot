@@ -1,6 +1,10 @@
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, InlineKeyboardButton, InlineKeyboardMarkup
-from config import TOKEN_API 
+from aiogram.dispatcher.filters.state import State, StatesGroup
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.types import ParseMode
+from aiogram.dispatcher import FSMContext
+from config import TOKEN_API, ADMIN_ID 
 from strings import HELP_COMMAND, START_TEXT, DESCRIPTION, COUNT_ERROR
 from backend.main import result
 from backend.main import handle_variable
@@ -40,13 +44,63 @@ ikb_back_only.add(ill_come_back)
 async def on_startup(_):
     print("Стартуем!")
 
+# Определение состояний FSM
+class MenuStates(StatesGroup):
+    main_menu = State()
+
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
     global previous_message
     await message.answer(text= START_TEXT, parse_mode="HTML", reply_markup = ikb) # написать
     previous_message = message.text
-    #await message.delete() # удоли сообщение пользователя
-        
+
+    if message.from_user.id == ADMIN_ID:
+        keyboard_admin = types.ReplyKeyboardMarkup(row_width=2)
+        buttons = [
+            types.KeyboardButton(text="Список пользователей"),
+            types.KeyboardButton(text="Отправить объявление"),
+            types.KeyboardButton(text="Запрос3")
+            # Добавь остальные кнопки
+        ]
+        keyboard_admin.add(*buttons)
+
+        await message.answer("Меню команд", reply_markup=keyboard_admin)
+
+        await MenuStates.main_menu.set()
+    else:
+        await message.answer("Вы не администратор бота.")
+# Обработчик команды /cancel
+@dp.message_handler(commands=["cancel"], state="*")
+async def cancel(message: types.Message, state: FSMContext):
+    # Проверяем, что идентификатор пользователя соответствует администратору бота
+    if message.from_user.id == ADMIN_ID:
+        await state.finish()
+
+        keyboard_admin = types.ReplyKeyboardRemove()
+        await message.answer("Вы отменили текущее действие.", reply_markup=keyboard_admin)
+    else:
+        await message.answer("Вы не администратор бота.")
+
+
+# Обработчик сообщений для главного меню
+@dp.message_handler(state=MenuStates.main_menu)
+async def main_menu_handler(message: types.Message, state: FSMContext):
+    # Проверяем, что идентификатор пользователя соответствует администратору бота
+    if message.from_user.id == ADMIN_ID:
+        if message.text == "Список пользователей":
+            await message.answer("Вы выбрали: Список пользователей")
+            await state.finish()
+        elif message.text == "Отправить объявление":
+            await message.answer("Вы выбрали: Отправить объявление")
+            await state.finish()
+        elif message.text == "Запрос3":
+            await message.answer("Вы выбрали: Запрос3")
+            await state.finish()    
+        else:
+            await message.answer("Выберите кнопку из меню.")
+    else:
+        await message.answer("Вы не администратор бота.")
+
 @dp.message_handler(commands=['help'])
 async def help_command(message: types.Message):
     global previous_message
@@ -68,7 +122,7 @@ async def description_command(message: types.Message):
     
 @dp.message_handler(text = 'Описание')
 async def help_command(message: types.Message):
-    await message.answer(DESCRIPTION, reply_markup=ikb_back_only) # ответить
+    await message.answer(DESCRIPTION, reply_markup=ikb_back_only) 
     await message.delete()     
 
 @dp.message_handler(text = 'Пенис')
@@ -82,18 +136,19 @@ async def send_penis(message: types.Message):
     
 
 @dp.message_handler()
-async def interception(message: types.Message):
+async def interception(message: types.Message): # проверка вводимых слов
     global number_of_inputs
     global previous_message
-    if message.text.count(' ') >= 1:
-        previous_message = message.text
-        await message.answer(result(message.text), reply_markup=ikb_back_only)
-    else:
-        await message.answer(text = COUNT_ERROR, parse_mode="HTML", reply_markup=kb)
-        number_of_inputs +=1
-        if number_of_inputs > 2:
-            await bot.send_sticker(message.from_user.id, sticker="CAACAgIAAxkBAAEJ9exk0oa87s2dqdLDTO0j6_g3tyYDbgAC1AsAAg74eUlJg1T3YVm93jAE")
-            number_of_inputs = 0
+    while message.text != "Список пользователей":
+        if message.text.count(' ') >= 1 and message.text:
+            previous_message = message.text
+            await message.answer(result(message.text), reply_markup=ikb_back_only)
+        else:
+            await message.answer(text = COUNT_ERROR, parse_mode="HTML", reply_markup=kb)
+            number_of_inputs +=1
+            if number_of_inputs > 2:
+                await bot.send_sticker(message.from_user.id, sticker="CAACAgIAAxkBAAEJ9exk0oa87s2dqdLDTO0j6_g3tyYDbgAC1AsAAg74eUlJg1T3YVm93jAE")
+                number_of_inputs = 0
           
 
 @dp.callback_query_handler(lambda callback_query: callback_query.data == 'names_tobacco') #Табаки
@@ -143,17 +198,17 @@ async def back_back_button(callback_query: types.CallbackQuery):
     await bot.send_message(callback_query.from_user.id, text= START_TEXT, parse_mode="HTML", reply_markup = ikb)      
 
 
-current_time = datetime.now()
-formatted_date = current_time.strftime("%Y-%m-%d %H:%M:%S")
-logging.basicConfig(
-        level=logging.DEBUG,
-        format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
-        handlers=[
-            logging.FileHandler('bot.log'),
-            logging.StreamHandler(),
-        ],
-    )
-logging.debug('Старт программы')
+#current_time = datetime.now()
+#formatted_date = current_time.strftime("%Y-%m-%d %H:%M:%S")
+#logging.basicConfig(
+#        level=logging.DEBUG,
+#        format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
+#        handlers=[
+#            logging.FileHandler('bot.log'),
+#            logging.StreamHandler(),
+#        ],
+#    )
+#logging.debug('Старт программы')
 
 if __name__ == "__main__":
     #logging.basicConfig(level=logging.INFO, stream=sys.stdout)
