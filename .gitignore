@@ -2,6 +2,7 @@ venv/
 venv/Scripts/
 venv/Lib/
 
-config.py
+config.ini
 __pycache__/
 bot.log
+venvBot/

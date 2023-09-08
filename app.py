@@ -4,16 +4,18 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.types import ParseMode
 from aiogram.dispatcher import FSMContext
-from config import TOKEN_API, ADMIN_ID 
 from strings import HELP_COMMAND, START_TEXT, DESCRIPTION, COUNT_ERROR
 from backend.main import result
 from backend.main import handle_variable
 from backend.additional_functions import find_all_names, ManufacorChoice, handle_variable2
 import logging
+import configparser
 from datetime import datetime
 #from os import getenv
+config = configparser.ConfigParser()  # создаём объекта парсера
+config.read("config.ini")  # читаем конфиг
 
-bot = Bot(TOKEN_API)
+bot = Bot(config["BOT"]["TOKEN_API"])
 dp = Dispatcher(bot)
 
 #logging.basicConfig(level=logging.INFO)
@@ -54,7 +56,7 @@ async def start(message: types.Message):
     await message.answer(text= START_TEXT, parse_mode="HTML", reply_markup = ikb) # написать
     previous_message = message.text
 
-    if message.from_user.id == ADMIN_ID:
+    if message.from_user.id == config["BOT"]["ADMIN_ID"]:
         keyboard_admin = types.ReplyKeyboardMarkup(row_width=2)
         buttons = [
             types.KeyboardButton(text="Список пользователей"),
@@ -73,7 +75,7 @@ async def start(message: types.Message):
 @dp.message_handler(commands=["cancel"], state="*")
 async def cancel(message: types.Message, state: FSMContext):
     # Проверяем, что идентификатор пользователя соответствует администратору бота
-    if message.from_user.id == ADMIN_ID:
+    if message.from_user.id == config["BOT"]["ADMIN_ID"]:
         await state.finish()
 
         keyboard_admin = types.ReplyKeyboardRemove()
@@ -86,7 +88,7 @@ async def cancel(message: types.Message, state: FSMContext):
 @dp.message_handler(state=MenuStates.main_menu)
 async def main_menu_handler(message: types.Message, state: FSMContext):
     # Проверяем, что идентификатор пользователя соответствует администратору бота
-    if message.from_user.id == ADMIN_ID:
+    if message.from_user.id == config["BOT"]["ADMIN_ID"]:
         if message.text == "Список пользователей":
             await message.answer("Вы выбрали: Список пользователей")
             await state.finish()
